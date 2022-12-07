@@ -1,18 +1,23 @@
-# Minetest sponge mod
-## Water-removing sponges for Minetest.
+# Sponge
 
-made by Benjie/Fiftysix - 27/8/18
+Liquid-removing sponges.
+
+[Original](https://github.com/BenjieFiftysix/sponge) made by Benjie/Fiftysix - 27/8/18
 updated 22/12/20
 
-[Forum topic](https://forum.minetest.net/viewtopic.php?f=9&t=20729)
+[Original forum topic](https://forum.minetest.net/viewtopic.php?f=9&t=20729)
 
-Soggy sponges can rarely be found deep in the sea where the darkness begins.
-These can be cooked into dry sponges, and then placed near a liquid to remove an area of it
-They will hold the water away until they are removed.
-This will cause them to become soggy, so to use them again they have to be cooked.
+## In the box
 
-### How it works:
-* Sponges create a 9x9x9 cube of air-like nodes that water can't flow through (checks for protection).
-* If sponges have cleared more than 3 nodes of liquid, they become soggy sponges.
-* Removing a sponge or soggy sponge will turn a 9x9x9 cube of air-like nodes back into air, as long as they are not in the area of another sponge.
-*(Air-like nodes can be removed in protection by removing a sponge outside the protection, they are not meant to be permanent)*
+- A dry sponge, when placed replaces a set of liquids into air. (unlike the Original we don't keep liquid away, due to an [issue](https://github.com/BenjieFiftysix/sponge/issues/2))
+- When a dry sponge replaces 3 or more liquids it becomes soaked.
+- Cooking a soaked sponge returns a dry sponge.
+- **Or** place a soaked sponge in the crafting grid with a empty bucket to collect the liquid. (at most 1 bucket of liquid can be obtained, regardless of how much liquid the sponge really soaked up)
+- There are 4 variants of sponges. (dry, water, river_water, lava)
+- The dry sponge can collect both water or lava! (lava has a reduced collection range)
+
+## Setting types
+
+- `sponge.soak_lava` (boolean, default true) Can dry sponges soak up lava?
+- `sponge.range` (int, default 6) Distance that liquids from a placed dry sponge will be turned to air, Can't be smaller than 4. (a dry sponge soaking lava reduces this by 2, thus must be 4 or higher)
+- `sponge.minimum` (int, default 3) Number of liquids a placed dry sponge must turn to air before becoming a soaked sponge.
