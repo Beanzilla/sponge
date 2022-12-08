@@ -53,11 +53,13 @@ sponge.is_river = function(node)
 end
 
 -- Checks if the node is lava (only if a sponge can soak up lava)
-sponge.is_lava = function(node)
+--
+-- Also accepts admin mode (so the chat command will regardless soak up lava)
+sponge.is_lava = function(node, admin)
     if type(node) ~= "string" and node.name ~= nil then
         node = node.name
     end
-    if not sponge.settings.soak_lava then -- stop here, we don't want to replace lava
+    if not sponge.settings.soak_lava and admin == nil then -- stop here, we don't want to replace lava
         return false
     end
     for _, val in pairs(sponge.liquids.lava) do
@@ -94,6 +96,9 @@ local placement = function(pos)
         --minetest.log("action", "[sponge] nodes=" .. minetest.serialize(nodes))
     end
     local area = minetest.find_nodes_in_area(min, max, nodes)
+    if not area or #area == 0 then -- We found nothing
+        goto done -- Skip!
+    end
     local waters = 0
     local rivers = 0
     local lavas = 0
@@ -101,7 +106,7 @@ local placement = function(pos)
         local node = minetest.get_node_or_nil(area[i])
         if not node then
             minetest.log("action", "[sponge] Failed obtaining node " .. minetest.pos_to_string(area[i], 1))
-            return
+            goto continue -- Keep going  even though we got an error
         end
         --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
         local delta = vector.subtract(area[i], pos)
@@ -129,6 +134,7 @@ local placement = function(pos)
                 minetest.remove_node(area[i])
             end
         end
+        ::continue::
     end
     local total = waters + rivers + lavas
     if total < sponge.settings.minimum then
@@ -153,6 +159,57 @@ local placement = function(pos)
             minetest.swap_node(pos, {name="sponge:sponge_lava"})
         end
     end
+end
+
+-- This is the admin chat command function
+--
+-- It ignores sponge.soak_lava, and doesn't replace any node since there isn't one. (it moves by player)
+sponge._placement = function(pos)
+    local min = vector.subtract(pos, {x=sponge.settings.range, y=sponge.settings.range, z=sponge.settings.range})
+    local max = vector.add(pos, {x=sponge.settings.range, y=sponge.settings.range, z=sponge.settings.range})
+    --minetest.log("action", "[sponge] min=" .. minetest.pos_to_string(min) .. " max=" .. minetest.pos_to_string(max))
+    if #nodes == 0 then -- Generate a cache of nodes we look for
+        for _, val in pairs(sponge.liquids.water) do
+            table.insert(nodes, val)
+        end
+        for _, val in pairs(sponge.liquids.river) do
+            table.insert(nodes, val)
+        end
+        for _, val in pairs(sponge.liquids.lava) do
+            table.insert(nodes, val)
+        end
+        --minetest.log("action", "[sponge] nodes=" .. minetest.serialize(nodes))
+    end
+    local area = minetest.find_nodes_in_area(min, max, nodes)
+    if not area or #area == 0 then -- We found nothing
+        goto done -- Skip!
+    end
+    for i=1, #area do
+        local node = minetest.get_node_or_nil(area[i])
+        if not node then
+            minetest.log("action", "[sponge] Failed obtaining node " .. minetest.pos_to_string(area[i], 1))
+            goto continue -- Keep going  even though we got an error
+        end
+        --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
+        local delta = vector.subtract(area[i], pos)
+        local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
+        local range = sponge.settings.range
+        if distance <= range then
+            local replace = false
+            if sponge.is_water(node) then
+                replace = true
+            elseif sponge.is_river(node) then
+                replace = true
+            elseif sponge.is_lava(node, true) then
+                replace = true
+            end
+            if replace then
+                minetest.remove_node(area[i])
+            end
+        end
+        ::continue::
+    end
+    ::done::
 end
 
 minetest.register_node("sponge:sponge", {  -- dry sponge
@@ -272,6 +329,8 @@ minetest.register_decoration({
     decoration = "sponge:sponge_river",
 })
 
+-- Admin chat command
+dofile(modpath .. DIR_DELIM .. "admin.lua")
+
 minetest.log("action", "[sponge] Version: " .. sponge.version)
 minetest.log("action", "[sponge] Ready")
-
