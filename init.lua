@@ -5,7 +5,7 @@ sponge = {
         minimum = 3, -- Minimum nodes needed to replace the dry sponge to a wet/soggy sponge?
         soak_lava = true, -- do sponges soak up lava?
     },
-    version = "2.0", -- Our version
+    version = "2.0.1", -- Our version
     liquids = {
         water = { -- Nodes counted as water
             "default:water_source",
@@ -159,6 +159,7 @@ local placement = function(pos)
             minetest.swap_node(pos, {name="sponge:sponge_lava"})
         end
     end
+    ::done::
 end
 
 -- This is the admin chat command function
