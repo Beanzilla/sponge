@@ -271,3 +271,7 @@ minetest.register_decoration({
     flags = "force_placement",
     decoration = "sponge:sponge_river",
 })
+
+minetest.log("action", "[sponge] Version: " .. sponge.version)
+minetest.log("action", "[sponge] Ready")
+
