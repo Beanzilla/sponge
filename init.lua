@@ -229,7 +229,7 @@ minetest.register_craft({
         "bucket:bucket_empty"
     },
     replacements = {
-        {"bucket:bucket_empty", "bucket:bucket_river"}
+        {"bucket:bucket_empty", "bucket:bucket_river_water"}
     }
 })
 minetest.register_craft({
