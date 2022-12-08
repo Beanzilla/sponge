@@ -110,6 +110,9 @@ local placement = function(pos)
         if sponge.is_lava(node) then
             range = range - 2
         end
+        if range <= 0 then
+            range = 1
+        end
         if distance <= range then
             local replace = false
             if sponge.is_water(node) then
