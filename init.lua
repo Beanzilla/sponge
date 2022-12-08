@@ -12,8 +12,8 @@ sponge = {
             "default:water_flowing"
         },
         river = { -- Nodes counted as river water
-            "default:river_source",
-            "default:river_flowing",
+            "default:river_water_source",
+            "default:river_water_flowing",
         },
         lava = { -- Nodes counted as lava
             "default:lava_source",
@@ -68,24 +68,32 @@ sponge.is_lava = function(node)
     return false
 end
 
+local nodes = {} -- Cache the list of nodes we look for
+
 -- Given the position of which we've placed a dry sponge
 --
 -- Replaces liquids into air (counting each one by water, river water, and lava)
 -- Determins if the dry sponge replaced enough liquids to be swapped
 -- Determins what the sponge should swap too by the count of each node
 --
--- Will return a non null/nil value if an error occured (being text to return to placer and has been logged)
-sponge.placement = function(pos)
+-- Will log any errors it encounters
+local placement = function(pos)
     local min = vector.subtract(pos, {x=sponge.settings.range, y=sponge.settings.range, z=sponge.settings.range})
     local max = vector.add(pos, {x=sponge.settings.range, y=sponge.settings.range, z=sponge.settings.range})
-    local area = minetest.find_nodes_in_area(min, max, {
-        sponge.liquids.water[1],
-        sponge.liquids.water[2],
-        sponge.liquids.river[1],
-        sponge.liquids.river[2],
-        sponge.liquids.lava[1],
-        sponge.liquids.lava[2],
-    })
+    --minetest.log("action", "[sponge] min=" .. minetest.pos_to_string(min) .. " max=" .. minetest.pos_to_string(max))
+    if #nodes == 0 then -- Generate a cache of nodes we look for
+        for _, val in pairs(sponge.liquids.water) do
+            table.insert(nodes, val)
+        end
+        for _, val in pairs(sponge.liquids.river) do
+            table.insert(nodes, val)
+        end
+        for _, val in pairs(sponge.liquids.lava) do
+            table.insert(nodes, val)
+        end
+        --minetest.log("action", "[sponge] nodes=" .. minetest.serialize(nodes))
+    end
+    local area = minetest.find_nodes_in_area(min, max, nodes)
     local waters = 0
     local rivers = 0
     local lavas = 0
@@ -93,8 +101,9 @@ sponge.placement = function(pos)
         local node = minetest.get_node_or_nil(area[i])
         if not node then
             minetest.log("action", "[sponge] Failed obtaining node " .. minetest.pos_to_string(area[i], 1))
-            return "Failed obtianing node " .. minetest.pos_to_string(area[i], 1)
+            return
         end
+        --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
         local delta = vector.subtract(area[i], pos)
         local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
         local range = sponge.settings.range
@@ -148,26 +157,25 @@ minetest.register_node("sponge:sponge", {  -- dry sponge
     tiles = {"sponge_sponge.png"},
     groups = {crumbly=3},
     sounds = default.node_sound_dirt_defaults(),
-    
-    after_place_node = sponge.placement,
+    after_place_node = placement,
 })
 
 minetest.register_node("sponge:sponge_water", {
-    description = "Wet Sponge",
+    description = "Wet Sponge (Water)",
     tiles = {"sponge_water_sponge.png"},
     groups = {crumbly=3},
     sounds = default.node_sound_dirt_defaults(),
 })
 
 minetest.register_node("sponge:sponge_river", {
-    description = "Wet Sponge",
+    description = "Wet Sponge (River Water)",
     tiles = {"sponge_river_sponge.png"},
     groups = {crumbly=3},
     sounds = default.node_sound_dirt_defaults(),
 })
 
 minetest.register_node("sponge:sponge_lava", {
-    description = "Wet Sponge",
+    description = "Wet Sponge (Lava)",
     tiles = {"sponge_lava_sponge.png"},
     groups = {crumbly=3},
     sounds = default.node_sound_dirt_defaults(),
@@ -193,7 +201,7 @@ minetest.register_craft({
     cooktime = 2,
 })
 
--- Perhaps use sponge_lava as fuel?
+-- Use sponge_lava as fuel
 minetest.register_craft({
 	type = "fuel",
 	recipe = "sponge:sponge_lava",
