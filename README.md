@@ -2,17 +2,15 @@
 
 Liquid-removing sponges.
 
-[Original](https://github.com/BenjieFiftysix/sponge) made by Benjie/Fiftysix - 27/8/18
-updated 22/12/20
-
-[Original forum topic](https://forum.minetest.net/viewtopic.php?f=9&t=20729)
+[Original](https://github.com/BenjieFiftysix/sponge) made by Benjie/Fiftysix
 
 ## In the box
 
 - A dry sponge, when placed replaces a set of liquids into air. (unlike the Original we don't keep liquid away, due to an [issue](https://github.com/BenjieFiftysix/sponge/issues/2))
 - When a dry sponge replaces 3 or more liquids it becomes soaked.
 - Cooking a soaked sponge returns a dry sponge.
-- **Or** place a soaked sponge in the crafting grid with a empty bucket to collect the liquid. (at most 1 bucket of liquid can be obtained, regardless of how much liquid the sponge really soaked up)
+- **Or** place a soaked sponge in the crafting grid with a empty bucket to collect the liquid and get a dry sponge back. (at most 1 bucket of liquid can be obtained, regardless of how much liquid the sponge really soaked up)
+- **Or** place soaked sponge full of lava as fuel in a furnace, you'll get a dry sponge back and get a awesome burntime.
 - There are 4 variants of sponges. (dry, water, river_water, lava)
 - The dry sponge can collect both water or lava! (lava has a reduced collection range)
 

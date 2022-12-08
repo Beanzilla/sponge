@@ -1,0 +1,9 @@
+
+# If enabled/true sponges can soak up lava as well as water
+sponge.soak_lava (Sponges Soak up Lava) bool true
+
+# The distance in which liquids are soaked up by a placing sponge
+sponge.range (Sponge Soak up Range) int 6 4 24
+
+# The minimum number of liquids a sponge needs to soak up to change to a wet sponge
+sponge.minimum (Sponge Soak Count) int 3 1 3000
