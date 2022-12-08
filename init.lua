@@ -97,7 +97,7 @@ local placement = function(pos)
     end
     local area = minetest.find_nodes_in_area(min, max, nodes)
     if not area or #area == 0 then -- We found nothing
-        goto done -- Skip!
+        goto done
     end
     local waters = 0
     local rivers = 0

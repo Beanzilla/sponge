@@ -44,20 +44,16 @@ minetest.register_on_leaveplayer(function(player)
     end
 end)
 
-local interval = 0
-mintest.register_globalstep(function(detla)
-    interval = interval + delta
-    if interval >= 1 then -- every second
-        for _, player in pairs(sponge.players) do
-            if not player then
-                goto continue
-            end
-            if not minetest.get_player_by_name(player:get_player_name()) then
-                goto continue
-            end
-            sponge._placement2(player:get_pos())
-            ::continue::
+minetest.register_globalstep(function()
+    for _, player in pairs(sponge.players) do
+        if not player then
+            goto continue
         end
-        interval = 0
+        local p =  minetest.get_player_by_name(player)
+        if not p then
+            goto continue
+        end
+        sponge._placement(p:get_pos())
+        ::continue::
     end
 end)
