@@ -46,14 +46,11 @@ end)
 
 minetest.register_globalstep(function()
     for _, player in pairs(sponge.players) do
-        if not player then
-            goto continue
+        if player then
+            local p =  minetest.get_player_by_name(player)
+            if p then
+                sponge._placement(p:get_pos())
+            end
         end
-        local p =  minetest.get_player_by_name(player)
-        if not p then
-            goto continue
-        end
-        sponge._placement(p:get_pos())
-        ::continue::
     end
 end)

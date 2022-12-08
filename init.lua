@@ -97,7 +97,7 @@ local placement = function(pos)
     end
     local area = minetest.find_nodes_in_area(min, max, nodes)
     if not area or #area == 0 then -- We found nothing
-        goto done
+        return
     end
     local waters = 0
     local rivers = 0
@@ -106,35 +106,34 @@ local placement = function(pos)
         local node = minetest.get_node_or_nil(area[i])
         if not node then
             minetest.log("action", "[sponge] Failed obtaining node " .. minetest.pos_to_string(area[i], 1))
-            goto continue -- Keep going  even though we got an error
-        end
-        --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
-        local delta = vector.subtract(area[i], pos)
-        local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
-        local range = sponge.settings.range
-        if sponge.is_lava(node) then
-            range = range - 2
-        end
-        if range <= 0 then
-            range = 1
-        end
-        if distance <= range then
-            local replace = false
-            if sponge.is_water(node) then
-                waters = waters + 1
-                replace = true
-            elseif sponge.is_river(node) then
-                rivers = rivers + 1
-                replace = true
-            elseif sponge.is_lava(node) then
-                lavas = lavas + 1
-                replace = true
+        else
+            --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
+            local delta = vector.subtract(area[i], pos)
+            local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
+            local range = sponge.settings.range
+            if sponge.is_lava(node) then
+                range = range - 2
             end
-            if replace then
-                minetest.remove_node(area[i])
+            if range <= 0 then
+                range = 1
+            end
+            if distance <= range then
+                local replace = false
+                if sponge.is_water(node) then
+                    waters = waters + 1
+                    replace = true
+                elseif sponge.is_river(node) then
+                    rivers = rivers + 1
+                    replace = true
+                elseif sponge.is_lava(node) then
+                    lavas = lavas + 1
+                    replace = true
+                end
+                if replace then
+                    minetest.remove_node(area[i])
+                end
             end
         end
-        ::continue::
     end
     local total = waters + rivers + lavas
     if total < sponge.settings.minimum then
@@ -159,7 +158,6 @@ local placement = function(pos)
             minetest.swap_node(pos, {name="sponge:sponge_lava"})
         end
     end
-    ::done::
 end
 
 -- This is the admin chat command function
@@ -183,34 +181,32 @@ sponge._placement = function(pos)
     end
     local area = minetest.find_nodes_in_area(min, max, nodes)
     if not area or #area == 0 then -- We found nothing
-        goto done -- Skip!
+        return
     end
     for i=1, #area do
         local node = minetest.get_node_or_nil(area[i])
         if not node then
             minetest.log("action", "[sponge] Failed obtaining node " .. minetest.pos_to_string(area[i], 1))
-            goto continue -- Keep going  even though we got an error
-        end
-        --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
-        local delta = vector.subtract(area[i], pos)
-        local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
-        local range = sponge.settings.range
-        if distance <= range then
-            local replace = false
-            if sponge.is_water(node) then
-                replace = true
-            elseif sponge.is_river(node) then
-                replace = true
-            elseif sponge.is_lava(node, true) then
-                replace = true
+        else
+            --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
+            local delta = vector.subtract(area[i], pos)
+            local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
+            local range = sponge.settings.range
+            if distance <= range then
+                local replace = false
+                if sponge.is_water(node) then
+                    replace = true
+                elseif sponge.is_river(node) then
+                    replace = true
+                elseif sponge.is_lava(node, true) then
+                    replace = true
+                end
+                if replace then
+                    minetest.remove_node(area[i])
+                end
             end
-            if replace then
-                minetest.remove_node(area[i])
-            end
         end
-        ::continue::
     end
-    ::done::
 end
 
 minetest.register_node("sponge:sponge", {  -- dry sponge
