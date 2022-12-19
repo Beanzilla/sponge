@@ -110,13 +110,7 @@ local placement = function(pos)
             --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
             local delta = vector.subtract(area[i], pos)
             local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
-            local range = sponge.settings.range
-            if sponge.is_lava(node) then
-                range = range - 2
-            end
-            if range <= 0 then
-                range = 1
-            end
+            local range = sponge.settings.range or 1
             if distance <= range then
                 local replace = false
                 if sponge.is_water(node) then
@@ -191,7 +185,7 @@ sponge._placement = function(pos)
             --minetest.log("action", "[sponge] " .. minetest.pos_to_string(area[i], 1) .. " = " .. node.name)
             local delta = vector.subtract(area[i], pos)
             local distance = (delta.x*delta.x) + (delta.y*delta.y) + (delta.z*delta.z)
-            local range = sponge.settings.range
+            local range = sponge.settings.range or 1
             if distance <= range then
                 local replace = false
                 if sponge.is_water(node) then
